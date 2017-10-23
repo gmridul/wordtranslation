@@ -1,0 +1,9 @@
+Old embed::
+Prec@1: 0.338
+Prec@5: 0.483
+Prec@10: 0.539
+
+New embed::
+Prec@1: 0.314
+Prec@5: 0.491
+Prec@10: 0.548
