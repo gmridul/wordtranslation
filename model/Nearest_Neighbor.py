@@ -10,24 +10,31 @@ import glob
 import os
 
 
-# In[43]:
+# In[1]:
 
 
 class Nearest_Neighbor(object):
     word_embedding_dict = dict()
     word_embedding_nn = dict()
-    def __init__(self, embeddings_dir, domain_dir, lang_list, k_neighbors):
+    def __init__(self, embeddings_dir, domain_dir, lang_list, k_neighbors, flag='train'):
         for lang  in lang_list:
             file_path = embeddings_dir+'/wiki.'+lang + '.vec'
             #cur_word_embeddings = self.load_word_embeddings(file_path)
             #print (np.shape(cur_word_embeddings))
-            Nearest_Neighbor.word_embedding_dict[lang] = self.load_word_embeddings(file_path, domain_dir, lang)
+            Nearest_Neighbor.word_embedding_dict[lang] = self.load_word_embeddings(file_path, domain_dir, lang, flag)
             Nearest_Neighbor.word_embedding_nn[lang] = NearestNeighbors(                            n_neighbors=k_neighbors, algorithm='ball_tree', metric='euclidean').fit(Nearest_Neighbor.word_embedding_dict[lang])
 
-    def load_word_embeddings(self, file_path, domain_dir, lang):
+    def load_word_embeddings(self, file_path, domain_dir, lang, flag):
         res = []
         words_in_domain = {}
-        for file in glob.glob(domain_dir+ '*' + lang + '*.txt'):
+        glob_dir = ""
+        
+        if(flag == 'test'):
+            glob_dir = domain_dir+ '*' + lang + '*.txt'
+        else: #train
+            glob_dir = domain_dir+ '*' + lang + '*train.txt'
+        
+        for file in glob.glob(glob_dir):
             file_name = (os.path.basename(file))
             lang_pair = file_name.split('_')[1].split('.')[0].split('-')
             index= -1
@@ -65,8 +72,15 @@ class Nearest_Neighbor(object):
 # point = Nearest_Neighbor.word_embedding_dict['pt'][0:10]
 # np.shape(n.knn(point, "pt", 5))
 
-# In[45]:
+# In[64]:
 
 
-#nearest_ne = Nearest_Neighbor(embeddings_dir="D:/UCSD/F17/CSE293/", domain_dir='D:/UCSD/F17/CSE293/wordtranslation/model/data/', lang_list=['es'], k_neighbors=10)
+#nearest_ne = Nearest_Neighbor(embeddings_dir="D:/UCSD/F17/CSE293/", domain_dir='D:/UCSD/F17/CSE293/wordtranslation/model/data/', lang_list=['dummy'], k_neighbors=3)
+
+
+# In[66]:
+
+
+#nearest_ne.knn([[1, 2, 3]], "dummy", 2)
+#Nearest_Neighbor.word_embedding_dict
 
