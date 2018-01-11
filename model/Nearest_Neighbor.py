@@ -6,25 +6,26 @@
 
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
+import sklearn.preprocessing as sk
 import glob
 import os
 
 
-# In[1]:
+# In[2]:
 
 
 class Nearest_Neighbor(object):
     word_embedding_dict = dict()
     word_embedding_nn = dict()
-    def __init__(self, embeddings_dir, domain_dir, lang_list, k_neighbors, flag='train'):
+    def __init__(self, embeddings_dir, domain_dir, lang_list, k_neighbors, flag='train', normalized=False):
         for lang  in lang_list:
             file_path = embeddings_dir+'/wiki.'+lang + '.vec'
             #cur_word_embeddings = self.load_word_embeddings(file_path)
             #print (np.shape(cur_word_embeddings))
-            Nearest_Neighbor.word_embedding_dict[lang] = self.load_word_embeddings(file_path, domain_dir, lang, flag)
+            Nearest_Neighbor.word_embedding_dict[lang] = self.load_word_embeddings(file_path, domain_dir, lang, flag, normalized)
             Nearest_Neighbor.word_embedding_nn[lang] = NearestNeighbors(                            n_neighbors=k_neighbors, algorithm='ball_tree', metric='euclidean').fit(Nearest_Neighbor.word_embedding_dict[lang])
 
-    def load_word_embeddings(self, file_path, domain_dir, lang, flag):
+    def load_word_embeddings(self, file_path, domain_dir, lang, flag, normalized):
         res = []
         words_in_domain = {}
         glob_dir = ""
@@ -54,8 +55,10 @@ class Nearest_Neighbor(object):
                 if vec[0].strip() in words_in_domain:
                     #print(vec[0].strip())
                     res.append([float(x) for x in vec[1:-1]])
-        return np.array(res)
-        
+        if normalized:
+            return np.array(sk.normalize(res))
+        else:
+            return np.array(res)
     # word_vec is 2D vector list of words.
     def knn(self, word_vec, lang, k=10):
         #assert input word_vec is 2D 
